@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carte du donjon</title>
+
+<style>
+body {
+  background: #202124;
+  color: white;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+h2 { text-align: center; }
+
+.rooms {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  max-width: 600px;
+  margin: auto;
+}
+
+button {
+  padding: 20px 5px;
+  border: 1px solid #666;
+  border-radius: 10px;
+  background: #444;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+button.active {
+  background: #238636;
+  border-color: #40c463;
+}
+
+.info {
+  text-align: center;
+  margin: 20px;
+  color: #aaa;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Zone d'errance du donjon</h2>
+
+<div class="info" id="info"></div>
+<div class="rooms" id="rooms"></div>
+
+<script>
+const totalRooms = 10;
+
+// Salles accessibles au départ
+let accessible = JSON.parse(
+  localStorage.getItem("donjon") || "[3,4,5,6,7]"
+);
+
+function displayRooms() {
+  const container = document.getElementById("rooms");
+  container.innerHTML = "";
+
+  for (let i = 1; i <= totalRooms; i++) {
+    const button = document.createElement("button");
+    const active = accessible.includes(i);
+
+    button.textContent = "Salle " + i +
+      (active ? " ✓" : " 🔒");
+
+    if (active) button.classList.add("active");
+
+    button.onclick = () => {
+      if (accessible.includes(i)) {
+        accessible = accessible.filter(n => n !== i);
+      } else {
+        accessible.push(i);
+      }
+
+      localStorage.setItem(
+        "donjon",
+        JSON.stringify(accessible)
+      );
+
+      displayRooms();
+    };
+
+    container.appendChild(button);
+  }
+
+  document.getElementById("info").textContent =
+    accessible.length + " / " + totalRooms +
+    " salles accessibles";
+}
+
+displayRooms();
+</script>
+
+</body>
+</html>
